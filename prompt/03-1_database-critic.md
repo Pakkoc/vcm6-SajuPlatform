@@ -18,3 +18,5 @@
 - 먼저 간략한 데이터플로우를 응답하고, 이후 구체적인 데이터베이스 스키마를 응답하라.
 - PostgreSQL을 사용한다.
 
+또한, 이를 데이터베이스에 반영하기위한 migration sql을 /supabase/migrations 경로에 생성하라.
+
