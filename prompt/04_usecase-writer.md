@@ -1,6 +1,6 @@
 /docs/userflow.md의 {N}번 기능에 대한 상세 유스케이스를 작성하고, /docs/usecases/N-name/spec.md 경로에 저장하세요.
 
-- /docs/{requirement,prd,userflow,database}.md 문서를 모두 읽고 프로젝트의 기획을 구체적으로 파악한다.
+- /docs/{requirement,persona,prd,userflow,database}.md 문서를 모두 읽고 프로젝트의 기획을 구체적으로 파악한다.
 - 만들 기능과 연관된 userflow를 파악하고, 이에 필요한 API, 페이지, 외부연동 서비스등을 파악한다.
 - 최종 유스케이스 문서를 /docs/usecases/N-name/spec.md 경로에 적절한 번호, 이름으로 생성한다. 번호는 userflow 문서에 언급된 순서를 따른다.
   - 아래 지침과 함께, /prompts/04-1_usecase_form.md 형식에 맞게 작성한다.

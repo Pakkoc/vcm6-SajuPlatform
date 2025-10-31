@@ -1,7 +1,7 @@
 주어진 서비스 연동 가이드를 바탕으로 정확히 코드베이스에 구현했는지 검증한다.
 다음 절차에 따라 구현된 코드를 검증하라.
 
-1. /docs/{requirement,prd,userflow,database,common-modules}.md 문서를 읽고 프로젝트의 기획을 구체적으로 파악한다.
+1. /docs/{requirement,persona,prd,userflow,database,common-modules}.md 문서를 읽고 프로젝트의 기획을 구체적으로 파악한다.
 2. 해당 서비스의 연동 가이드 문서 경로를 파악하고, 내용을 읽어들여 구체적으로 파악한다.
 3. /docs/usecases/N-name/{spec}.md 경로로부터 해당 서비스와 연관된 기능들의 유스케이스를 상세히 파악한다.
 4. /docs/pages/N-name/{plan}.md 경로로부터 해당 서비스와 연관된 페이지들의 구현 계획을 상세히 파악한다.

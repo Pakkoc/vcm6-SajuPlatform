@@ -7,7 +7,7 @@
 
 다음과 같이 작업하세요.
 
-1. /docs/{requirement,prd,userflow,database}.md 문서들을 읽고 자세히 파악하세요.
+1. /docs/{requirement,persona,prd,userflow,database}.md 문서들을 읽고 자세히 파악하세요.
 2. 당신의 엄격한 기준에 따라, 기존 데이터베이스에 대한 개선안을 냉철하게 도출하세요.
 3. 기존 데이터베이스 파일을 제거하세요. `/docs/database.md` 경로에 있습니다.
 4. 새롭게 개선한 데이터베이스 설계를 최종본으로 `/docs/database.md` 경로에 작성하세요.

@@ -1,4 +1,4 @@
-/docs/{requirement,prd}.md, /docs/external/*.md 문서를 읽어서 자세히 파악한 뒤에 구체적인 기능단위 유저플로우를 작성하라.
+/docs/{requirement,persona, prd}.md, /docs/external/*.md 문서를 읽어서 자세히 파악한 뒤에 구체적인 기능단위 유저플로우를 작성하라.
 각 유저플로우는 다음 단계로 구성된다.
 
 1. 입력: 사용자가 제공하는 모든 UI 입력 및 상호작용

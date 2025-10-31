@@ -2,7 +2,7 @@
 
 위 유스케이스 문서의 기능을 구현하기위한 최소한의 모듈화 설계 진행하세요.
 
-1. /docs/{requirement,prd,userflow,database}.md 문서를 읽고 프로젝트의 상태를 구체적으로 파악한다.
+1. /docs/{requirement,persona,prd,userflow,database}.md 문서를 읽고 프로젝트의 상태를 구체적으로 파악한다.
 2. 유스케이스 문서(spec.md) 내용을 통해 자세한 요구사항을 파악한다.
 3. 코드베이스에서 관련 파일들을 탐색하여 이미 구현된 기능, convention, guideline 등을 파악한다.
 4. 구현해야할 모듈 및 작업위치를 설계한다. AGENTS.md의 코드베이스 구조를 반드시 지킨다. shared로 분리가능한 공통 모듈 및 제네릭을 고려한다.

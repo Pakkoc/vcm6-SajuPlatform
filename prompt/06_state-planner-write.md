@@ -2,7 +2,7 @@
 
 Context + useReducer를 사용할 것이다.
 
-1. /docs/{requirement,prd,userflow,database,common-modules}.md 문서를 읽고 프로젝트의 상태를 구체적으로 파악한다.
+1. /docs/{requirement,persona,prd,userflow,database,common-modules}.md 문서를 읽고 프로젝트의 상태를 구체적으로 파악한다.
 2. 이 페이지와 연관된 유스케이스 문서들을 /docs/usecases 경로에서 적절히 찾아 읽는다.
 3. 먼저 관리해야할 상태 데이터 목록을 나열하고, 화면상에 보여지는 데이터지만 상태가 아닌 것도 나열한다.
 4. 각 상태가 변경되는 조건과, 변경 시 화면이 어떻게 달라지는지 표로 정리한다.
