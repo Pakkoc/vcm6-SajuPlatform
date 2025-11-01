@@ -3,66 +3,79 @@
 ## 📊 Executive Summary (경영진 보고용 개요)
 
 ### 목표
-MVP 프로젝트의 **품질 보증을 위한 최소한의 테스트 인프라** 구축. 단위 테스트와 E2E 테스트 환경을 설정하고 각 1개의 예시 테스트 작성.
+MVP 프로젝트의 **품질 보증을 위한 최소한의 테스트 인프라** 구축. 환경 설정과 동시에 **즉시 가치를 제공하는 핵심 비즈니스 로직 테스트** 작성.
 
 ### 선택한 기술 스택
 - **단위 테스트**: Vitest + React Testing Library
-- **E2E 테스트**: Playwright
-- **목 라이브러리**: MSW (Mock Service Worker)
+- **E2E 테스트**: Playwright (환경만 구축, 실제 테스트는 페이지 개발 시)
+- **모킹 전략**: Vitest의 vi.mock() (MSW 제외)
 
 ### 핵심 결정 사항
 1. Jest 대신 **Vitest** 선택 (Next.js 15 + Turbopack 최적 호환)
 2. Cypress 대신 **Playwright** 선택 (빠른 실행 속도, 병렬 테스트 지원)
-3. **통합 테스트는 제외** (MVP 단계에서 오버엔지니어링)
+3. **MSW 제거** (MVP 단계에서 과도한 설정, vi.mock()으로 충분)
+4. **통합 테스트는 제외** (MVP 단계에서 오버엔지니어링)
+5. **TDD 워크플로우 가이드 추가** (실제 개발과 연계)
 
 ### 예상 소요 시간
-- 환경 구축: 2-3시간
-- 예시 테스트 작성: 1시간
-- **총 3-4시간**
+- 환경 구축: 1-2시간 (MSW 제거로 단축)
+- 핵심 테스트 작성: 1-2시간 (비즈니스 로직 중심)
+- **총 2-4시간**
 
 ---
 
 ## ✅ 장점
 
-### 1. 개발 속도 최적화
+### 1. 즉각적인 가치 제공
+- 환경 구축과 동시에 **실제 비즈니스 로직 테스트** 작성
+- 날짜 유틸리티 대신 **구독 횟수 차감, Pro/Free 플랜 구분** 등 핵심 로직 테스트
+- MVP 개발에 즉시 활용 가능한 테스트 5개 제공
+
+### 2. MVP 철학 완벽 부합
+- MSW 제거로 **설정 시간 50% 단축** (3-4시간 → 1-2시간)
+- vi.mock() 사용으로 **간결한 모킹 전략**
+- 통합 테스트 제외로 **복잡도 최소화**
+
+### 3. 개발 속도 최적화
 - Vitest는 Vite 기반으로 **HMR 지원** → 테스트 재실행 속도 극대화
 - Playwright는 **병렬 실행** 기본 지원 → E2E 테스트 시간 단축
+- Next.js 15 + Turbopack과 **네이티브 호환**
 
-### 2. Next.js 15 생태계 최적화
-- Vitest는 Next.js 15 + Turbopack과 **네이티브 호환**
-- React Testing Library는 **React 19 공식 지원**
+### 4. TDD 워크플로우 통합
+- Red-Green-Refactor 사이클 가이드 제공
+- 실제 개발 시나리오 기반 예시
+- 테스트 우선 작성 문화 정착 지원
 
-### 3. 최소 설정으로 최대 효과
-- Vitest는 **제로 컨피그** 철학 (설정 파일 최소화)
-- Playwright는 **자동 브라우저 설치** 및 관리
-
-### 4. CI/CD 친화적
-- 두 도구 모두 **GitHub Actions 공식 지원**
-- Playwright는 **테스트 리포트 자동 생성**
+### 5. Hono API 테스트 전략 명확화
+- Hono Context 모킹 방법 제시
+- Supabase 클라이언트 모킹 가이드
+- API 라우트 단위 테스트 예시 포함
 
 ---
 
 ## ⚠️ 예상되는 한계점
 
-### 1. 외부 서비스 의존성
+### 1. MSW 제거로 인한 제약
+- **문제**: 네트워크 레벨 모킹 불가
+- **해결책**: Vitest의 vi.mock()으로 모듈 레벨 모킹 (단위 테스트에는 충분)
+- **영향**: E2E 테스트는 Playwright의 page.route() 사용
+
+### 2. E2E 테스트 예시 부족
+- **문제**: 환경만 구축하고 실제 테스트는 나중에 작성
+- **해결책**: 페이지 개발 시 함께 작성 (더 실용적)
+- **영향**: 초기 투자 시간 단축, 실제 개발과 연계
+
+### 3. 외부 서비스 의존성
 - **Clerk, Supabase, 토스페이먼츠, Gemini API**는 실제 환경 필요
-- **해결책**: MSW로 API 모킹, E2E는 테스트 계정 사용
+- **해결책**: 단위 테스트에서는 vi.mock()으로 모킹, E2E는 테스트 계정 사용
 
-### 2. 데이터베이스 격리 문제
-- E2E 테스트 시 **실제 Supabase DB 사용** 불가피
-- **해결책**: 테스트 전용 Supabase 프로젝트 생성 (선택 사항)
-
-### 3. Clerk 인증 테스트 복잡도
+### 4. Clerk 인증 모킹 복잡도
 - Clerk OAuth 플로우는 **실제 Google 로그인 필요**
-- **해결책**: Clerk 테스트 모드 사용, E2E는 수동 로그인 후 세션 재사용
+- **해결책**: 테스트에서는 userId만 주입하는 헬퍼 함수, E2E는 수동 로그인 후 세션 재사용
 
-### 4. 비용 발생 가능성
-- Gemini API 호출 시 **실제 비용 발생**
-- **해결책**: 테스트에서는 MSW로 모킹, E2E는 최소 호출
-
-### 5. 커버리지 제한
-- MVP 단계에서 **100% 커버리지는 비현실적**
-- **목표**: 핵심 비즈니스 로직 70% 이상
+### 5. 커버리지 목표 조정
+- MVP 단계에서 **높은 커버리지는 비현실적**
+- **목표**: 전체 40%, 비즈니스 로직 80%, 유틸리티 70%
 
 ---
 
@@ -115,24 +128,26 @@ MVP 프로젝트의 **품질 보증을 위한 최소한의 테스트 인프라**
 - **Cypress**: 인기 있지만 느리고 병렬 실행 제한적
 - **Puppeteer**: 낮은 수준의 API, 테스트 작성 복잡
 
-#### 1.3 목 라이브러리: MSW (Mock Service Worker)
+#### 1.3 모킹 전략: Vitest vi.mock()
 
 **선택 이유**:
-1. **네트워크 레벨 모킹**
-   - 실제 HTTP 요청을 가로채서 모킹
-   - axios, fetch 등 모든 HTTP 클라이언트 지원
+1. **간결한 설정**
+   - 별도 라이브러리 불필요
+   - Vitest 내장 기능 활용
+   - MVP 단계에 최적화
 
-2. **브라우저와 Node.js 공통 사용**
-   - 단위 테스트와 E2E 테스트 모두 사용 가능
-   - 일관된 모킹 전략
+2. **모듈 레벨 모킹**
+   - 함수, 클래스, 모듈 전체 모킹 가능
+   - Supabase 클라이언트, Clerk 인증 등 모킹 용이
 
-3. **실제 API와 동일한 구조**
-   - 프로덕션 코드 변경 불필요
-   - API 스펙 변경 시 모킹 코드만 수정
+3. **타입 안전성**
+   - TypeScript와 완벽 통합
+   - 모킹된 함수도 타입 체크
 
-**대안 검토**:
-- **nock**: Node.js 전용, 브라우저 미지원
-- **axios-mock-adapter**: axios 전용, 범용성 낮음
+**MSW를 제외한 이유**:
+- MVP 단계에서 **과도한 설정** (handlers, server, browser 파일 필요)
+- 단위 테스트에서는 **vi.mock()으로 충분**
+- E2E 테스트는 **Playwright의 page.route()** 사용 가능
 
 ---
 
@@ -192,23 +207,20 @@ MVP 프로젝트의 **품질 보증을 위한 최소한의 테스트 인프라**
 
 ### 3. 구현 계획
 
-#### Phase 1: 환경 설정 (1-2시간)
+#### Phase 1: 환경 설정 (1시간)
 
 **1.1 의존성 설치**
 
 ```bash
-# 단위 테스트
-npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
+# 단위 테스트 (필수)
+npm install -D vitest @vitest/ui @vitest/coverage-v8
+npm install -D @testing-library/react @testing-library/jest-dom jsdom
 
-# E2E 테스트
+# E2E 테스트 (선택적)
 npm install -D @playwright/test
-
-# 모킹
-npm install -D msw
-
-# 타입 정의
-npm install -D @types/testing-library__jest-dom
 ```
+
+**MSW 제거**: vi.mock()으로 충분, 설정 복잡도 감소
 
 **1.2 설정 파일 생성**
 
@@ -224,6 +236,16 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        '**/*.test.{ts,tsx}',
+        '**/*.spec.{ts,tsx}',
+        'e2e/',
+      ],
+    },
   },
   resolve: {
     alias: {
@@ -236,12 +258,16 @@ export default defineConfig({
 **파일**: `vitest.setup.ts`
 ```typescript
 import '@testing-library/jest-dom';
-import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server } from './src/mocks/server';
+import { vi } from 'vitest';
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+// 환경 변수 모킹 (필요 시)
+vi.mock('@/constants/env', () => ({
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-key',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+  },
+}));
 ```
 
 **파일**: `playwright.config.ts`
@@ -280,111 +306,120 @@ export default defineConfig({
   "scripts": {
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   }
 }
 ```
 
-**1.4 MSW 핸들러 설정**
-
-**파일**: `src/mocks/handlers.ts`
-```typescript
-import { http, HttpResponse } from 'msw';
-
-export const handlers = [
-  // 구독 정보 조회 모킹
-  http.get('/api/subscription', () => {
-    return HttpResponse.json({
-      plan: 'free',
-      status: 'active',
-      remaining_count: 1,
-      next_billing_date: null,
-    });
-  }),
-
-  // Gemini API 모킹
-  http.post('https://generativelanguage.googleapis.com/v1beta/models/*', () => {
-    return HttpResponse.json({
-      candidates: [
-        {
-          content: {
-            parts: [{ text: '모킹된 사주 분석 결과입니다.' }],
-          },
-        },
-      ],
-    });
-  }),
-];
-```
-
-**파일**: `src/mocks/server.ts`
-```typescript
-import { setupServer } from 'msw/node';
-import { handlers } from './handlers';
-
-export const server = setupServer(...handlers);
-```
-
-**파일**: `src/mocks/browser.ts`
-```typescript
-import { setupWorker } from 'msw/browser';
-import { handlers } from './handlers';
-
-export const worker = setupWorker(...handlers);
-```
-
 ---
 
-#### Phase 2: 단위 테스트 예시 작성 (30분)
+#### Phase 2: 핵심 비즈니스 로직 테스트 작성 (1-2시간)
 
-**파일**: `src/lib/utils/date.test.ts`
+**목표**: 즉시 가치를 제공하는 핵심 테스트 5개 작성
 
+**2.1 플랜 유틸리티 테스트** (20분)
+
+**파일**: `src/features/subscription/lib/plan-utils.ts` (먼저 생성)
+```typescript
+export function canAnalyze(plan: 'free' | 'pro', remainingCount: number): boolean {
+  return remainingCount > 0;
+}
+
+export function getModelForPlan(plan: 'free' | 'pro'): string {
+  return plan === 'pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+}
+```
+
+**파일**: `src/features/subscription/lib/plan-utils.test.ts`
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { formatRelativeTime, formatDate, formatDateTime } from './date';
+import { canAnalyze, getModelForPlan } from './plan-utils';
 
-describe('날짜 유틸리티 함수', () => {
-  describe('formatRelativeTime', () => {
-    it('과거 날짜를 상대 시간으로 변환한다', () => {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      
-      const result = formatRelativeTime(threeDaysAgo);
-      
-      expect(result).toContain('3일');
-      expect(result).toContain('전');
+describe('플랜 유틸리티', () => {
+  describe('canAnalyze', () => {
+    it('Free 플랜에서 횟수가 남아있으면 true', () => {
+      expect(canAnalyze('free', 1)).toBe(true);
     });
 
-    it('문자열 날짜도 처리한다', () => {
-      const dateString = '2025-10-28';
-      
-      const result = formatRelativeTime(dateString);
-      
-      expect(result).toBeTruthy();
-      expect(typeof result).toBe('string');
+    it('Free 플랜에서 횟수가 0이면 false', () => {
+      expect(canAnalyze('free', 0)).toBe(false);
+    });
+
+    it('Pro 플랜에서 횟수가 남아있으면 true', () => {
+      expect(canAnalyze('pro', 5)).toBe(true);
     });
   });
 
-  describe('formatDate', () => {
-    it('날짜를 YYYY-MM-DD 형식으로 변환한다', () => {
-      const date = new Date('2025-10-31T14:30:00');
-      
-      const result = formatDate(date);
-      
-      expect(result).toBe('2025-10-31');
+  describe('getModelForPlan', () => {
+    it('Free 플랜은 gemini-2.5-flash 모델을 사용한다', () => {
+      expect(getModelForPlan('free')).toBe('gemini-2.5-flash');
+    });
+
+    it('Pro 플랜은 gemini-2.5-pro 모델을 사용한다', () => {
+      expect(getModelForPlan('pro')).toBe('gemini-2.5-pro');
     });
   });
+});
+```
 
-  describe('formatDateTime', () => {
-    it('날짜와 시간을 YYYY-MM-DD HH:mm 형식으로 변환한다', () => {
-      const date = new Date('2025-10-31T14:30:00');
-      
-      const result = formatDateTime(date);
-      
-      expect(result).toBe('2025-10-31 14:30');
-    });
+**실행**:
+```bash
+npm run test plan-utils
+```
+
+**2.2 API 에러 핸들링 테스트** (20분)
+
+**파일**: `src/lib/remote/api-client.test.ts`
+```typescript
+import { describe, it, expect } from 'vitest';
+import { extractApiErrorMessage } from './api-client';
+import { AxiosError } from 'axios';
+
+describe('extractApiErrorMessage', () => {
+  it('Axios 에러에서 error.message를 추출한다', () => {
+    const error = new AxiosError('Request failed');
+    error.response = {
+      data: {
+        error: {
+          message: 'Insufficient credits',
+        },
+      },
+    } as any;
+
+    expect(extractApiErrorMessage(error)).toBe('Insufficient credits');
+  });
+
+  it('일반 Error 객체에서 message를 추출한다', () => {
+    const error = new Error('Something went wrong');
+    expect(extractApiErrorMessage(error)).toBe('Something went wrong');
+  });
+
+  it('알 수 없는 에러는 fallback 메시지를 반환한다', () => {
+    const error = { unknown: 'error' };
+    expect(extractApiErrorMessage(error)).toBe('API request failed.');
+  });
+});
+```
+
+**2.3 날짜 유틸리티 테스트** (10분)
+
+**파일**: `src/lib/utils/date.test.ts`
+```typescript
+import { describe, it, expect } from 'vitest';
+import { formatDate, formatDateTime } from './date';
+
+describe('날짜 유틸리티', () => {
+  it('날짜를 YYYY-MM-DD 형식으로 변환한다', () => {
+    const date = new Date('2025-10-31T14:30:00');
+    expect(formatDate(date)).toBe('2025-10-31');
+  });
+
+  it('날짜와 시간을 YYYY-MM-DD HH:mm 형식으로 변환한다', () => {
+    const date = new Date('2025-10-31T14:30:00');
+    expect(formatDateTime(date)).toBe('2025-10-31 14:30');
   });
 });
 ```
@@ -396,28 +431,121 @@ npm run test
 
 **예상 결과**:
 ```
-✓ src/lib/utils/date.test.ts (3)
-  ✓ 날짜 유틸리티 함수 (3)
-    ✓ formatRelativeTime (2)
-      ✓ 과거 날짜를 상대 시간으로 변환한다
-      ✓ 문자열 날짜도 처리한다
-    ✓ formatDate (1)
-      ✓ 날짜를 YYYY-MM-DD 형식으로 변환한다
-    ✓ formatDateTime (1)
-      ✓ 날짜와 시간을 YYYY-MM-DD HH:mm 형식으로 변환한다
+✓ src/features/subscription/lib/plan-utils.test.ts (5)
+✓ src/lib/remote/api-client.test.ts (3)
+✓ src/lib/utils/date.test.ts (2)
 
-Test Files  1 passed (1)
-Tests  4 passed (4)
-Duration  234ms
+Test Files  3 passed (3)
+Tests  10 passed (10)
+Duration  156ms
 ```
 
 ---
 
-#### Phase 3: E2E 테스트 예시 작성 (30분)
+#### Phase 3: TDD 워크플로우 정착 (지속적)
 
-**파일**: `e2e/landing-page.spec.ts`
+**목표**: 모든 신규 기능 개발 시 TDD 적용
+
+**3.1 Red-Green-Refactor 사이클**
+
+**실제 개발 시나리오: 구독 횟수 차감 기능**
+
+**Step 1: RED (실패하는 테스트 작성)**
 
 ```typescript
+// src/features/subscription/backend/service.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { decrementRemainingCount } from './service';
+
+describe('구독 횟수 차감', () => {
+  it('구독 횟수를 1 차감한다', async () => {
+    const mockSupabase = createMockSupabase();
+    const userId = 'user-123';
+    
+    const result = await decrementRemainingCount(mockSupabase, userId);
+    
+    expect(result.remaining_count).toBe(0);
+  });
+});
+```
+
+```bash
+$ npm run test
+# ❌ FAIL: decrementRemainingCount is not defined
+```
+
+**Step 2: GREEN (최소한의 코드로 통과)**
+
+```typescript
+// src/features/subscription/backend/service.ts
+export async function decrementRemainingCount(
+  supabase: SupabaseClient,
+  userId: string
+) {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .update({ remaining_count: 0 }) // 일단 하드코딩
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+```
+
+```bash
+$ npm run test
+# ✅ PASS: 1 test passed
+```
+
+**Step 3: REFACTOR (코드 개선)**
+
+```typescript
+// src/features/subscription/backend/service.ts
+export async function decrementRemainingCount(
+  supabase: SupabaseClient,
+  userId: string
+) {
+  const { data, error } = await supabase.rpc('decrement_subscription_count', {
+    p_user_id: userId,
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+```
+
+```bash
+$ npm run test
+# ✅ PASS: 1 test passed (리팩토링 후에도 통과)
+```
+
+**3.2 TDD 체크리스트**
+
+**매 기능 개발 시 확인**:
+- [ ] 테스트를 먼저 작성했는가?
+- [ ] 테스트가 실패하는 것을 확인했는가?
+- [ ] 최소한의 코드로 통과시켰는가?
+- [ ] 리팩토링 후에도 테스트가 통과하는가?
+- [ ] 커밋 메시지에 테스트 추가 여부를 명시했는가?
+
+**3.3 E2E 테스트는 페이지 개발 시 작성**
+
+**이유**:
+1. 페이지가 없는 상태에서 E2E 테스트 작성은 무의미
+2. 페이지 개발과 동시에 E2E 테스트 작성이 더 효율적
+3. 실제 UI 구현을 보면서 테스트 시나리오 조정 가능
+
+**작성 시점**:
+- 랜딩 페이지 개발 완료 → `e2e/landing.spec.ts` 작성
+- 사주 분석 페이지 개발 완료 → `e2e/saju-analysis.spec.ts` 작성
+- 구독 관리 페이지 개발 완료 → `e2e/subscription.spec.ts` 작성
+
+**E2E 테스트 예시 템플릿**:
+
+```typescript
+// e2e/landing.spec.ts (페이지 개발 완료 후 작성)
 import { test, expect } from '@playwright/test';
 
 test.describe('랜딩 페이지', () => {
@@ -428,57 +556,10 @@ test.describe('랜딩 페이지', () => {
     // Then: 서비스명이 표시된다
     await expect(page.getByText('Saju맛피아')).toBeVisible();
 
-    // And: Hero 섹션이 표시된다
-    await expect(page.getByRole('heading', { name: /AI가 분석하는/ })).toBeVisible();
-
     // And: CTA 버튼이 표시된다
     await expect(page.getByRole('button', { name: '무료로 시작하기' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '자세히 알아보기' })).toBeVisible();
-  });
-
-  test('Features 섹션으로 스크롤 이동한다', async ({ page }) => {
-    // Given: 사용자가 메인 페이지에 접속
-    await page.goto('/');
-
-    // When: "자세히 알아보기" 버튼 클릭
-    await page.getByRole('button', { name: '자세히 알아보기' }).click();
-
-    // Then: Features 섹션으로 스크롤 이동
-    await expect(page.locator('#features')).toBeInViewport();
-
-    // And: Features 카드가 표시된다
-    await expect(page.getByText('AI 기반 정확한 분석')).toBeVisible();
-    await expect(page.getByText('합리적인 가격')).toBeVisible();
-    await expect(page.getByText('검사 내역 영구 보관')).toBeVisible();
-  });
-
-  test('회원가입 페이지로 이동한다', async ({ page }) => {
-    // Given: 사용자가 메인 페이지에 접속
-    await page.goto('/');
-
-    // When: "무료로 시작하기" 버튼 클릭
-    await page.getByRole('button', { name: '무료로 시작하기' }).click();
-
-    // Then: 회원가입 페이지로 이동
-    await expect(page).toHaveURL('/sign-up');
   });
 });
-```
-
-**실행 방법**:
-```bash
-npm run test:e2e
-```
-
-**예상 결과**:
-```
-Running 3 tests using 1 worker
-
-  ✓  e2e/landing-page.spec.ts:3:1 › 랜딩 페이지 › 메인 페이지가 정상적으로 로드된다 (1.2s)
-  ✓  e2e/landing-page.spec.ts:18:1 › 랜딩 페이지 › Features 섹션으로 스크롤 이동한다 (0.8s)
-  ✓  e2e/landing-page.spec.ts:34:1 › 랜딩 페이지 › 회원가입 페이지로 이동한다 (0.5s)
-
-  3 passed (2.5s)
 ```
 
 ---
@@ -612,35 +693,49 @@ jobs:
 project-root/
 ├── src/
 │   ├── lib/
-│   │   └── utils/
-│   │       ├── date.ts
-│   │       └── date.test.ts          # 단위 테스트
-│   ├── components/
-│   │   └── common/
-│   │       ├── plan-badge.tsx
-│   │       └── plan-badge.test.tsx   # 컴포넌트 테스트
-│   └── mocks/
-│       ├── handlers.ts               # MSW 핸들러
-│       ├── server.ts                 # Node.js용
-│       └── browser.ts                # 브라우저용
+│   │   ├── utils/
+│   │   │   ├── date.ts
+│   │   │   └── date.test.ts
+│   │   └── remote/
+│   │       ├── api-client.ts
+│   │       └── api-client.test.ts
+│   ├── features/
+│   │   └── subscription/
+│   │       ├── backend/
+│   │       │   ├── service.ts
+│   │       │   ├── service.test.ts      # 비즈니스 로직 테스트
+│   │       │   ├── route.ts
+│   │       │   └── route.test.ts        # API 라우트 테스트
+│   │       └── lib/
+│   │           ├── plan-utils.ts
+│   │           └── plan-utils.test.ts   # 유틸리티 테스트
+│   └── components/
+│       └── common/
+│           ├── plan-badge.tsx
+│           └── plan-badge.test.tsx      # 컴포넌트 테스트 (선택적)
 ├── e2e/
-│   ├── landing-page.spec.ts         # E2E 테스트
-│   ├── auth.spec.ts
-│   └── saju-analysis.spec.ts
+│   └── (페이지 개발 시 추가)
 ├── vitest.config.ts
 ├── vitest.setup.ts
 └── playwright.config.ts
 ```
 
+**MSW 관련 파일 제거**:
+- ❌ `src/mocks/handlers.ts`
+- ❌ `src/mocks/server.ts`
+- ❌ `src/mocks/browser.ts`
+
 ---
 
 ### 7. 테스트 커버리지 목표
 
-**MVP 단계 목표**:
-- **전체 커버리지**: 50% 이상
-- **비즈니스 로직**: 80% 이상
-- **유틸리티 함수**: 90% 이상
-- **컴포넌트**: 30% 이상 (선택적)
+**MVP 단계 목표** (현실적으로 조정):
+- **전체 커버리지**: 40% 이상 (기존 50% → 40%)
+- **비즈니스 로직**: 80% 이상 (유지)
+- **유틸리티 함수**: 70% 이상 (기존 90% → 70%)
+- **컴포넌트**: 20% 이상 (기존 30% → 20%, 선택적)
+
+**이유**: MVP 단계에서 너무 높은 목표는 개발 속도 저하
 
 **커버리지 확인**:
 ```bash
@@ -903,10 +998,18 @@ MVP를 빠르게 출시해야 하는 상황에서 이 테스트 계획의 실행
 
 이 테스트 계획은 **MVP 단계에 최적화**되어 있습니다:
 
-1. ✅ **최소 투자**: 3-4시간으로 환경 구축 완료
-2. ✅ **최대 효과**: 핵심 기능 70% 이상 커버
-3. ✅ **확장 가능**: 추후 테스트 추가 용이
-4. ✅ **팀 친화적**: 간단한 설정, 명확한 가이드
+1. ✅ **최소 투자**: 2-4시간으로 환경 구축 + 핵심 테스트 완료 (기존 3-4시간 대비 단축)
+2. ✅ **즉시 가치**: 환경 구축과 동시에 비즈니스 로직 테스트 작성
+3. ✅ **간결성**: MSW 제거로 설정 복잡도 50% 감소
+4. ✅ **TDD 통합**: Red-Green-Refactor 사이클 가이드 제공
+5. ✅ **확장 가능**: 추후 테스트 추가 용이
+6. ✅ **팀 친화적**: 간단한 설정, 명확한 가이드, 실제 개발 시나리오
 
-**다음 단계**: 이 문서를 기반으로 환경을 구축하고, 팀원들과 함께 테스트 작성 문화를 만들어가세요.
+**다음 단계**: 
+1. Phase 1 (1시간): 환경 구축
+2. Phase 2 (1-2시간): 핵심 테스트 5개 작성
+3. Phase 3 (지속적): TDD 워크플로우 정착
+4. 페이지 개발 시: E2E 테스트 추가
+
+**핵심 원칙**: 테스트 우선 작성 → 최소 코드 구현 → 리팩토링
 
