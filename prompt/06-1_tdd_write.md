@@ -6,7 +6,7 @@
 이번 작업의 목표는 환경 구축입니다. 테스트는 단위테스트/E2E테스트 각각 간단한 예시 하나만 생성하세요.
 
 
-우선, /docs/{requirement,persona,prd,userflow,database,common-modules}.md, /docs/external/\*.md를 꼼꼼히 파악하라.
+우선, /docs/{requirement,persona,prd,userflow,database,common-modules}.md,/docs/rules/tdd, /docs/external/\*.md를 꼼꼼히 파악하라.
 
 반드시 지켜야할 규칙:
 - 먼저 상급자에게 보고하기위한 간략한 개요를 응답하세요. 이 내용만으로도 대략적 평가가 가능해야합니다.
