@@ -2,7 +2,10 @@ import { Hono } from "hono";
 import { errorBoundary } from "@/backend/middleware/error";
 import { withAppContext } from "@/backend/middleware/context";
 import { withSupabase } from "@/backend/middleware/supabase";
-import { registerExampleRoutes } from "@/features/example/backend/route";
+import { registerSajuAnalysisRoutes } from "@/features/saju-analysis/backend/route";
+import { registerSubscriptionRoutes } from "@/features/subscription/backend/route";
+import { registerClerkWebhookRoute } from "@/features/clerk-webhook/backend/route";
+import { registerCronRoutes } from "@/features/cron/backend/route";
 import type { AppEnv } from "@/backend/hono/context";
 
 let singletonApp: Hono<AppEnv> | null = null;
@@ -18,7 +21,10 @@ export const createHonoApp = () => {
   app.use("*", withAppContext());
   app.use("*", withSupabase());
 
-  registerExampleRoutes(app);
+  registerSajuAnalysisRoutes(app);
+  registerSubscriptionRoutes(app);
+  registerClerkWebhookRoute(app);
+  registerCronRoutes(app);
 
   app.notFound((c) => {
     return c.json(

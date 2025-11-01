@@ -1,34 +1,41 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
-import { LOGIN_PATH } from "@/constants/auth";
+import { useAuth } from "@clerk/nextjs";
+import { AuthenticatedLayout } from "@/components/layouts/authenticated-layout";
+import { ROUTES } from "@/constants/routes";
+
+type ProtectedLayoutProps = {
+  children: React.ReactNode;
+};
 
 const buildRedirectUrl = (pathname: string) => {
-  const redirectUrl = new URL(LOGIN_PATH, window.location.origin);
+  const redirectUrl = new URL(ROUTES.signIn, window.location.origin);
   redirectUrl.searchParams.set("redirectedFrom", pathname);
   return redirectUrl.toString();
 };
 
-type ProtectedLayoutProps = {
-  children: ReactNode;
-};
-
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
-  const { isAuthenticated, isLoading } = useCurrentUser();
   const router = useRouter();
   const pathname = usePathname();
+  const shouldMockClerk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "test";
+
+  if (shouldMockClerk) {
+    return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
+  }
+
+  const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isLoaded && !isSignedIn) {
       router.replace(buildRedirectUrl(pathname));
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
+  }, [isLoaded, isSignedIn, pathname, router]);
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return null;
   }
 
-  return <>{children}</>;
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 }

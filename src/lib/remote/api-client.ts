@@ -1,7 +1,8 @@
 import axios, { isAxiosError } from "axios";
+import { clientEnv } from "@/constants/env";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
+  baseURL: clientEnv.NEXT_PUBLIC_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
