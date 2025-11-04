@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { clientEnv } from "@/constants/env";
 import type { Database } from "./types";
+
+type ServerSupabaseClient = ReturnType<typeof createServerClient<Database>>;
 
 type WritableCookieStore = Awaited<ReturnType<typeof cookies>> & {
   set?: (options: {
@@ -18,7 +19,7 @@ type WritableCookieStore = Awaited<ReturnType<typeof cookies>> & {
 };
 
 export const createSupabaseServerClient = async (): Promise<
-  SupabaseClient<Database>
+  ServerSupabaseClient
 > => {
   const cookieStore = (await cookies()) as WritableCookieStore;
 

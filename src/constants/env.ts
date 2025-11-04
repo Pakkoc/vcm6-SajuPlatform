@@ -45,7 +45,10 @@ export const clientEnv = parseEnv(clientEnvSchema, {
 });
 
 const ensureProductionSecrets = (env: ServerEnv) => {
-  if (process.env.NODE_ENV === "production") {
+  const isProd = process.env.NODE_ENV === "production";
+  const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+
+  if (isProd && !isBuildPhase) {
     if (!env.CLERK_WEBHOOK_SECRET) {
       throw new Error("production 환경에서는 CLERK_WEBHOOK_SECRET이 필요합니다.");
     }

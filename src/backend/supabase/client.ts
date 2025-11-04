@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/types';
+
+type ServiceSupabaseClient = ReturnType<typeof createClient<Database>>;
 
 export type ServiceClientConfig = {
   url: string;
@@ -10,7 +11,7 @@ export type ServiceClientConfig = {
 export const createServiceClient = ({
   url,
   serviceRoleKey,
-}: ServiceClientConfig): SupabaseClient<Database> =>
+}: ServiceClientConfig): ServiceSupabaseClient =>
   createClient<Database>(url, serviceRoleKey, {
     auth: {
       persistSession: false,

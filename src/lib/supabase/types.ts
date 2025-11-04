@@ -20,6 +20,7 @@ export type Database = {
           email?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       subscriptions: {
         Row: {
@@ -55,6 +56,7 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       saju_analyses: {
         Row: {
@@ -90,8 +92,10 @@ export type Database = {
           result?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
     Functions: {
       create_analysis_with_usage: {
         Args: {
@@ -106,6 +110,8 @@ export type Database = {
         Returns: string;
       };
     };
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 };
 
