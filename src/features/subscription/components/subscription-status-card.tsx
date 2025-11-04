@@ -12,6 +12,7 @@ import {
 } from "@/constants/subscription";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/utils/date";
 import { useSubscriptionInfo } from "../hooks/use-subscription-info";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -105,7 +106,7 @@ export function SubscriptionStatusCard() {
         {data.nextBillingDate ? (
           <p className="text-xs text-slate-500">
             다음 결제 예정일:{" "}
-            <time dateTime={data.nextBillingDate}>{data.nextBillingDate}</time>
+            <time dateTime={data.nextBillingDate}>{formatDate(data.nextBillingDate)}</time>
           </p>
         ) : null}
       </CardContent>

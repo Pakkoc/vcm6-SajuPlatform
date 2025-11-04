@@ -1,6 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/constants/routes";
 import { useDashboardContext } from "../context/dashboard-context";
 import { AnalysisCard } from "./analysis-card";
 
@@ -59,13 +62,18 @@ export function AnalysisGrid() {
 
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-white/80 p-10 text-center">
-        <p className="text-sm font-semibold text-slate-700">
-          아직 분석 내역이 없습니다.
-        </p>
-        <p className="text-xs text-slate-500">
-          첫 분석을 시작하면 결과가 여기에 표시됩니다.
-        </p>
+      <div className="flex flex-col items-center gap-4 rounded-3xl border border-slate-200 bg-white/80 p-10 text-center">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-slate-700">
+            아직 분석 내역이 없습니다.
+          </p>
+          <p className="text-xs text-slate-500">
+            첫 분석을 시작하면 결과가 여기에 표시됩니다.
+          </p>
+        </div>
+        <Button asChild className="bg-slate-900 text-white hover:bg-slate-800">
+          <Link href={ROUTES.newAnalysis}>첫 분석 시작하기</Link>
+        </Button>
       </div>
     );
   }

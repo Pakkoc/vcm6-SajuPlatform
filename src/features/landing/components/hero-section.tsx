@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import { HERO_CONTENT } from "../constants";
+import { HERO_CONTENT, LANDING_SECTIONS } from "../constants";
 
 export function HeroSection() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export function HeroSection() {
 
   return (
     <section
-      id={HERO_CONTENT.title.toLowerCase()}
+      id={LANDING_SECTIONS.hero}
       className="relative isolate flex flex-col gap-12 overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-10 shadow-xl backdrop-blur md:flex-row"
     >
       <div className="flex flex-1 flex-col justify-center gap-6">

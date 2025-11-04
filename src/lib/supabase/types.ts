@@ -92,6 +92,20 @@ export type Database = {
         };
       };
     };
+    Functions: {
+      create_analysis_with_usage: {
+        Args: {
+          p_user_id: string;
+          p_name: string;
+          p_birth_date: string;
+          p_birth_time: string | null;
+          p_gender: "male" | "female";
+          p_model_used: "gemini-2.5-flash" | "gemini-2.5-pro";
+          p_result: string;
+        };
+        Returns: string;
+      };
+    };
   };
 };
 

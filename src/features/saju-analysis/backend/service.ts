@@ -1,5 +1,4 @@
 import type { SupabaseDb } from "@/lib/supabase/helpers";
-import type { Database } from "@/lib/supabase/types";
 import {
   findUserByClerkId,
   getAnalysisById,
@@ -200,42 +199,38 @@ export const createAnalysis = async (
       throw new Error("Gemini 응답이 비어 있습니다.");
     }
 
-    const analysisPayload = {
-      user_id: userData.id,
-      name: body.name,
-      birth_date: body.birthDate,
-      birth_time: body.birthTime ?? null,
-      gender: body.gender,
-      model_used: modelName,
-      result: text,
-    } as Database["public"]["Tables"]["saju_analyses"]["Insert"];
+    const summary = summarizeResult(text);
 
-    const insertResult = await (supabase as unknown as any)
-      .from("saju_analyses")
-      .insert(analysisPayload)
-      .select("id")
-      .single();
+    const rpcResult = await supabase.rpc("create_analysis_with_usage", {
+      p_user_id: userData.id,
+      p_name: body.name,
+      p_birth_date: body.birthDate,
+      p_birth_time: body.birthTime ?? null,
+      p_gender: body.gender,
+      p_model_used: modelName,
+      p_result: text,
+    });
 
-    if (insertResult.error || !insertResult.data) {
-      logger.error("Failed to insert analysis", insertResult.error);
-      return failure(500, analysisErrorCodes.analysisCreationFailed, "분석 결과 저장에 실패했습니다.");
+    if (rpcResult.error || !rpcResult.data) {
+      const errorMessage = rpcResult.error?.message ?? "사주 분석 생성에 실패했습니다.";
+      logger.error("Failed to create analysis via RPC", rpcResult.error);
+
+      if (errorMessage.includes("NO_REMAINING_COUNT")) {
+        return failure(403, analysisErrorCodes.noRemainingCount, "잔여 검사 횟수가 없습니다.");
+      }
+
+      return failure(500, analysisErrorCodes.analysisCreationFailed, "사주 분석 생성에 실패했습니다.");
     }
 
-    const updateResult = await (supabase as unknown as any)
-      .from("subscriptions")
-      .update({ remaining_count: subscriptionData.remaining_count - 1 })
-      .eq("user_id", userData.id);
-
-    if (updateResult.error) {
-      logger.warn("Failed to decrement remaining count", updateResult.error);
-    }
-
-    return success({
-      data: {
-        id: insertResult.data.id,
-        summary: summarizeResult(text),
+    return success(
+      {
+        data: {
+          id: rpcResult.data as string,
+          summary,
+        },
       },
-    }, 201);
+      201,
+    );
   } catch (error) {
     logger.error("Gemini analysis failed", error);
     return failure(500, analysisErrorCodes.analysisCreationFailed, "사주 분석 생성에 실패했습니다.");

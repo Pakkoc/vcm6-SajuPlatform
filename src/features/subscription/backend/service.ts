@@ -5,7 +5,7 @@ import {
   getSubscriptionByUserId,
   type SupabaseDb,
 } from "@/lib/supabase/helpers";
-import { issueBillingKey, payWithBillingKey } from "@/lib/payment/toss-client";
+import { deleteBillingKey, issueBillingKey, payWithBillingKey } from "@/lib/payment/toss-client";
 import { failure, success, type HandlerResult } from "@/backend/http/response";
 import { subscriptionErrorCodes } from "./error";
 
@@ -79,6 +79,25 @@ export const cancelSubscription = async (supabase: SupabaseDb, clerkUserId: stri
 
   const userData = userResult.data as unknown as { id: string };
 
+  const subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
+
+  if (subscriptionResult.error || !subscriptionResult.data) {
+    return failure(404, subscriptionErrorCodes.subscriptionNotFound, "구독 정보를 찾을 수 없습니다.");
+  }
+
+  const subscriptionData = subscriptionResult.data as unknown as {
+    plan: "free" | "pro";
+    status: "active" | "pending_cancellation";
+  };
+
+  if (subscriptionData.plan !== SUBSCRIPTION_PLANS.pro) {
+    return failure(400, subscriptionErrorCodes.invalidState, "Pro 요금제에서만 구독 취소를 요청할 수 있습니다.");
+  }
+
+  if (subscriptionData.status === SUBSCRIPTION_STATUS.pendingCancellation) {
+    return failure(409, subscriptionErrorCodes.invalidState, "이미 취소가 예약된 상태입니다.");
+  }
+
   const updateResult = await updateSubscription(supabase, userData.id, {
     status: SUBSCRIPTION_STATUS.pendingCancellation,
   });
@@ -99,6 +118,33 @@ export const reactivateSubscription = async (supabase: SupabaseDb, clerkUserId: 
 
   const userData = userResult.data as unknown as { id: string };
 
+  const subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
+
+  if (subscriptionResult.error || !subscriptionResult.data) {
+    return failure(404, subscriptionErrorCodes.subscriptionNotFound, "구독 정보를 찾을 수 없습니다.");
+  }
+
+  const subscriptionData = subscriptionResult.data as unknown as {
+    status: "active" | "pending_cancellation";
+    next_billing_date: string | null;
+  };
+
+  if (subscriptionData.status !== SUBSCRIPTION_STATUS.pendingCancellation) {
+    return failure(400, subscriptionErrorCodes.invalidState, "취소 예정 상태에서만 철회할 수 있습니다.");
+  }
+
+  if (!subscriptionData.next_billing_date) {
+    return failure(400, subscriptionErrorCodes.invalidState, "다음 결제일 정보가 없어 취소를 철회할 수 없습니다.");
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const nextBillingDate = new Date(subscriptionData.next_billing_date);
+
+  if (nextBillingDate < today) {
+    return failure(400, subscriptionErrorCodes.invalidState, "다음 결제일이 지나 취소를 철회할 수 없습니다.");
+  }
+
   const updateResult = await updateSubscription(supabase, userData.id, {
     status: SUBSCRIPTION_STATUS.active,
   });
@@ -118,6 +164,35 @@ export const terminateSubscription = async (supabase: SupabaseDb, clerkUserId: s
   }
 
   const userData = userResult.data as unknown as { id: string };
+
+  const subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
+
+  if (subscriptionResult.error || !subscriptionResult.data) {
+    return failure(404, subscriptionErrorCodes.subscriptionNotFound, "구독 정보를 찾을 수 없습니다.");
+  }
+
+  const subscriptionData = subscriptionResult.data as unknown as {
+    plan: "free" | "pro";
+    billing_key: string | null;
+  };
+
+  if (subscriptionData.plan !== SUBSCRIPTION_PLANS.pro) {
+    return failure(400, subscriptionErrorCodes.invalidState, "Pro 요금제에서만 즉시 해지가 가능합니다.");
+  }
+
+  if (!subscriptionData.billing_key) {
+    return failure(400, subscriptionErrorCodes.invalidState, "빌링키 정보가 존재하지 않습니다.");
+  }
+
+  try {
+    await deleteBillingKey(subscriptionData.billing_key);
+  } catch (error) {
+    return failure(
+      502,
+      subscriptionErrorCodes.billingKeyRemovalFailed,
+      (error as Error).message ?? "빌링키 삭제 중 문제가 발생했습니다.",
+    );
+  }
 
   const updateResult = await updateSubscription(supabase, userData.id, {
     plan: SUBSCRIPTION_PLANS.free,

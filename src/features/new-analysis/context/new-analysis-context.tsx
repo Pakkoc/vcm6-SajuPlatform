@@ -186,19 +186,19 @@ export function NewAnalysisProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "SUBMIT_START" });
 
     try {
-      const response = await apiClient.post("/saju-analyses", payload);
+      const response = await apiClient.post("/saju-analysis", payload);
       const parsed = AnalysisResponseSchema.safeParse(response.data);
 
-    if (!parsed.success) {
-      throw new Error("분석 결과 응답 형식이 올바르지 않습니다.");
-    }
+      if (!parsed.success) {
+        throw new Error("분석 결과 응답 형식이 올바르지 않습니다.");
+      }
 
-    const resultData = parsed.data.data as AnalysisResult;
+      const resultData = parsed.data.data as AnalysisResult;
 
-    dispatch({
-      type: "SUBMIT_SUCCESS",
-      payload: resultData,
-    });
+      dispatch({
+        type: "SUBMIT_SUCCESS",
+        payload: resultData,
+      });
     } catch (error) {
       const message = extractApiErrorMessage(
         error,

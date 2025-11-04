@@ -17,6 +17,24 @@ type TossPaymentResponse = {
   approvedAt: string;
 };
 
+export const deleteBillingKey = async (billingKey: string) => {
+  const response = await fetch(
+    `${TOSS_BASE_URL}/billing/authorizations/${billingKey}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: getAuthHeader(),
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`토스 빌링키 삭제에 실패했습니다. [${response.status}]`);
+  }
+
+  return true;
+};
+
 export const issueBillingKey = async (authKey: string, customerKey: string) => {
   const response = await fetch(`${TOSS_BASE_URL}/billing/authorizations/issue`, {
     method: "POST",

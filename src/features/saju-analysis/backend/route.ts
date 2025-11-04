@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 import { respond, failure } from "@/backend/http/response";
-import { type AppEnv, getLogger, getSupabase } from "@/backend/hono/context";
+import { type AppEnv, type AppContext, getLogger, getSupabase } from "@/backend/hono/context";
 import { getAuthenticatedUserId } from "@/lib/auth/get-clerk-user";
 import { CreateAnalysisBodySchema } from "./schema";
 import { createAnalysis, getAnalysisDetail, listAnalyses } from "./service";
@@ -41,7 +41,7 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
     }
   });
 
-  app.post("/api/saju-analyses", async (c) => {
+  const createAnalysisHandler = async (c: AppContext) => {
     const supabase = getSupabase(c);
     const logger = getLogger(c);
     const parsedBody = CreateAnalysisBodySchema.safeParse(await c.req.json());
@@ -64,5 +64,8 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
         failure(401, "UNAUTHORIZED", "인증 정보가 필요합니다."),
       );
     }
-  });
+  };
+
+  app.post("/api/saju-analysis", createAnalysisHandler);
+  app.post("/api/saju-analyses", createAnalysisHandler);
 };
