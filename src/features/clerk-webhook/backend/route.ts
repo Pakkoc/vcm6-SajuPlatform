@@ -6,14 +6,22 @@ import { handleUserCreated, handleUserDeleted, handleUserUpdated } from "./servi
 import { respond, success, failure } from "@/backend/http/response";
 import { getSupabase, getLogger, type AppEnv } from "@/backend/hono/context";
 
-const wh = new Webhook(serverEnv.CLERK_WEBHOOK_SECRET);
-
 export const registerClerkWebhookRoute = (app: Hono<AppEnv>) => {
   app.post("/api/webhooks/clerk", async (c) => {
     const payload = await c.req.text();
     const logger = getLogger(c);
+    const secret = serverEnv.CLERK_WEBHOOK_SECRET;
+
+    if (!secret) {
+      logger.warn("Clerk 웹훅 비밀 키가 설정되지 않아 요청을 처리할 수 없습니다.");
+      return respond(
+        c,
+        failure(503, "WEBHOOK_SECRET_NOT_CONFIGURED", "Clerk 웹훅 비밀 키가 설정되지 않았습니다."),
+      );
+    }
 
     try {
+      const wh = new Webhook(secret);
       const evt = wh.verify(payload, {
         "svix-id": c.req.header("svix-id") ?? "",
         "svix-timestamp": c.req.header("svix-timestamp") ?? "",

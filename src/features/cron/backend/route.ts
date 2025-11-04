@@ -8,6 +8,13 @@ export const registerCronRoutes = (app: Hono<AppEnv>) => {
   app.post("/api/cron/process-subscriptions", async (c) => {
     const authHeader = c.req.header("authorization") || c.req.header("Authorization");
 
+    if (!serverEnv.CRON_SECRET) {
+      return respond(
+        c,
+        failure(503, "CRON_SECRET_NOT_CONFIGURED", "CRON_SECRET 환경 변수가 설정되지 않았습니다."),
+      );
+    }
+
     if (!authHeader || authHeader !== `Bearer ${serverEnv.CRON_SECRET}`) {
       return respond(c, failure(401, "UNAUTHORIZED", "잘못된 호출입니다."));
     }
