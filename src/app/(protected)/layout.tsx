@@ -16,15 +16,23 @@ const buildRedirectUrl = (pathname: string) => {
   return redirectUrl.toString();
 };
 
-export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const shouldMockClerk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "test";
+const shouldMockClerk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "test";
 
+export default function ProtectedLayout(props: ProtectedLayoutProps) {
   if (shouldMockClerk) {
-    return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
+    return <MockProtectedLayout {...props} />;
   }
 
+  return <ClerkProtectedLayout {...props} />;
+}
+
+function MockProtectedLayout({ children }: ProtectedLayoutProps) {
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
+}
+
+function ClerkProtectedLayout({ children }: ProtectedLayoutProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {

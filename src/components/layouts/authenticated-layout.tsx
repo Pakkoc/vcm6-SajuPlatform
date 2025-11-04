@@ -4,10 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
-import {
-  LayoutDashboard,
-  PlusCircle,
-} from "lucide-react";
+import { LayoutDashboard, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/constants/routes";
 import { SubscriptionStatusCard } from "@/features/subscription/components/subscription-status-card";
@@ -35,9 +32,17 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   },
 ];
 
-export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const shouldMockClerk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "test";
-  const { isLoaded } = shouldMockClerk ? { isLoaded: true } : useUser();
+const shouldMockClerk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "test";
+
+export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
+  if (shouldMockClerk) {
+    return <MockAuthenticatedLayout {...props} />;
+  }
+
+  return <ClerkAuthenticatedLayout {...props} />;
+}
+
+function MockAuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -49,6 +54,58 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     [pathname],
   );
 
+  return (
+    <BaseLayout
+      activeHref={activeHref}
+      onNavigate={(href) => router.push(href)}
+      userSection={<div className="h-10 w-10 rounded-full bg-slate-200" />}
+    >
+      {children}
+    </BaseLayout>
+  );
+}
+
+function ClerkAuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isLoaded } = useUser();
+
+  const activeHref = useMemo(
+    () =>
+      NAVIGATION_ITEMS.find((item) =>
+        pathname.startsWith(item.href),
+      )?.href ?? ROUTES.dashboard,
+    [pathname],
+  );
+
+  const userSection = isLoaded ? (
+    <UserButton afterSignOutUrl={ROUTES.signIn} />
+  ) : (
+    <div className="h-10 w-10 animate-pulse rounded-full bg-slate-200" />
+  );
+
+  return (
+    <BaseLayout
+      activeHref={activeHref}
+      onNavigate={(href) => router.push(href)}
+      userSection={userSection}
+    >
+      {children}
+    </BaseLayout>
+  );
+}
+
+function BaseLayout({
+  children,
+  activeHref,
+  onNavigate,
+  userSection,
+}: {
+  children: React.ReactNode;
+  activeHref: string;
+  onNavigate: (href: string) => void;
+  userSection: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-screen w-full bg-slate-100">
       <aside className="hidden w-72 flex-col border-r border-slate-200 bg-white/80 p-6 backdrop-blur lg:flex">
@@ -65,7 +122,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
             <button
               key={item.href}
               type="button"
-              onClick={() => router.push(item.href)}
+              onClick={() => onNavigate(item.href)}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
                 activeHref === item.href
@@ -108,13 +165,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                   </Link>
                 ))}
               </nav>
-              {shouldMockClerk ? (
-                <div className="h-10 w-10 rounded-full bg-slate-200" />
-              ) : isLoaded ? (
-                <UserButton afterSignOutUrl={ROUTES.signIn} />
-              ) : (
-                <div className="h-10 w-10 animate-pulse rounded-full bg-slate-200" />
-              )}
+              {userSection}
             </div>
           </div>
         </header>
