@@ -17,7 +17,7 @@ export const registerSubscriptionRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
-      const userId = getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId();
       const result = await getSubscription(supabase, userId);
       return respond(c, result);
     } catch (error) {
@@ -34,7 +34,7 @@ export const registerSubscriptionRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
-      const userId = getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId();
       const result = await cancelSubscription(supabase, userId);
       return respond(c, result);
     } catch (error) {
@@ -51,7 +51,7 @@ export const registerSubscriptionRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
-      const userId = getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId();
       const result = await reactivateSubscription(supabase, userId);
       return respond(c, result);
     } catch (error) {
@@ -68,7 +68,7 @@ export const registerSubscriptionRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
-      const userId = getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId();
       const result = await terminateSubscription(supabase, userId);
       return respond(c, result);
     } catch (error) {
@@ -90,7 +90,7 @@ export const registerSubscriptionRoutes = (app: Hono<AppEnv>) => {
     }
 
     try {
-      const userId = getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId();
       const payload = query.data as { authKey: string; customerKey: string; orderId: string };
       const result = await upgradeSubscription(supabase, userId, payload);
 
