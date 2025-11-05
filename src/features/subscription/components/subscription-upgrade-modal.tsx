@@ -26,16 +26,38 @@ export function SubscriptionUpgradeModal() {
         return;
       }
 
+      console.log('🔍 [결제 위젯 초기화 시작]');
+      console.log('🔑 Client Key:', clientEnv.NEXT_PUBLIC_TOSS_CLIENT_KEY);
+      console.log('👤 Customer ID:', subscription.customerId);
+
+      if (!clientEnv.NEXT_PUBLIC_TOSS_CLIENT_KEY) {
+        console.error('❌ NEXT_PUBLIC_TOSS_CLIENT_KEY가 undefined입니다!');
+        alert('결제 시스템 초기화 실패: API 키가 설정되지 않았습니다.');
+        return;
+      }
+
       setIsRendering(true);
-      const widget = await loadPaymentWidget(
-        clientEnv.NEXT_PUBLIC_TOSS_CLIENT_KEY,
-        subscription.customerId,
-      );
-      widgetRef.current = widget;
-      await widget.renderPaymentMethods(`#${WIDGET_CONTAINER_ID}`, {
-        value: PLAN_LIMITS[SUBSCRIPTION_PLANS.pro].price,
-      });
-      setIsRendering(false);
+      try {
+        console.log('📦 loadPaymentWidget 호출 중...');
+        const widget = await loadPaymentWidget(
+          clientEnv.NEXT_PUBLIC_TOSS_CLIENT_KEY,
+          subscription.customerId,
+        );
+        console.log('✅ 위젯 인스턴스 생성 성공');
+        
+        widgetRef.current = widget;
+        
+        console.log('🎨 renderPaymentMethods 호출 중...');
+        await widget.renderPaymentMethods(`#${WIDGET_CONTAINER_ID}`, {
+          value: PLAN_LIMITS[SUBSCRIPTION_PLANS.pro].price,
+        });
+        console.log('✅ 결제 위젯 렌더링 성공');
+        setIsRendering(false);
+      } catch (error) {
+        console.error('❌ 결제 위젯 로드 실패:', error);
+        alert(`결제 시스템 초기화 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+        setIsRendering(false);
+      }
     };
 
     void renderWidget();
