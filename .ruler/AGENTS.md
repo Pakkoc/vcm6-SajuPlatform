@@ -9,6 +9,8 @@
 - Hono 라우트 경로는 반드시 `/api` prefix를 포함해야 함 (Next.js API 라우트가 `/api/[[...hono]]`에 위치하므로). 예: `app.post('/api/auth/signup', ...)`
 - `AppLogger`는 `info`, `error`, `warn`, `debug` 메서드만 제공함. `logger.log()` 대신 `logger.info()` 사용할 것.
 - API 응답 스키마에서 `redirectTo` 등 경로 필드는 `z.string().url()` 대신 `z.string()` 사용 (상대 경로 허용).
+- **Zod 스키마 파일 (`lib/dto.ts`)에는 `"use client"` 지시어를 사용하지 말 것.** 스키마는 서버/클라이언트 양쪽에서 사용 가능해야 하며, `"use client"`가 있으면 서버 빌드 시 문제가 발생함.
+- **Hono 라우트 핸들러에서 `getAuthenticatedUserId(c.req.raw)`는 반드시 `c.req.json()` 또는 `c.req.text()` 호출 전에 실행해야 함.** Request body는 한 번만 읽을 수 있는 스트림이므로, body를 읽은 후 Request 객체를 재사용하면 "Cannot construct a Request with a Request object that has already been used" 에러가 발생함.
 
 ## Library
 

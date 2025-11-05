@@ -9,7 +9,22 @@ export const getAuthenticatedUserId = async (request: Request) => {
     return "test_clerk_user_id";
   }
 
-  const nextRequest = request instanceof NextRequest ? request : new NextRequest(request);
+  let nextRequest: NextRequest;
+  
+  if (request instanceof NextRequest) {
+    nextRequest = request;
+  } else {
+    try {
+      nextRequest = new NextRequest(request);
+    } catch (error) {
+      throw new Error(
+        "Request 객체를 NextRequest로 변환할 수 없습니다. " +
+        "Request body가 이미 사용되었을 가능성이 있습니다. " +
+        "getAuthenticatedUserId는 req.json() 또는 req.text() 호출 전에 실행되어야 합니다."
+      );
+    }
+  }
+
   const { userId } = await getAuth(nextRequest);
 
   if (!userId) {

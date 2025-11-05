@@ -44,17 +44,18 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
   const createAnalysisHandler = async (c: AppContext) => {
     const supabase = getSupabase(c);
     const logger = getLogger(c);
-    const parsedBody = CreateAnalysisBodySchema.safeParse(await c.req.json());
-
-    if (!parsedBody.success) {
-      return respond(
-        c,
-        failure(400, "INVALID_BODY", "요청 본문 형식이 올바르지 않습니다.", parsedBody.error.flatten()),
-      );
-    }
 
     try {
       const userId = await getAuthenticatedUserId(c.req.raw);
+      const parsedBody = CreateAnalysisBodySchema.safeParse(await c.req.json());
+
+      if (!parsedBody.success) {
+        return respond(
+          c,
+          failure(400, "INVALID_BODY", "요청 본문 형식이 올바르지 않습니다.", parsedBody.error.flatten()),
+        );
+      }
+
       const result = await createAnalysis(supabase, logger, userId, parsedBody.data);
       return respond(c, result);
     } catch (error) {
