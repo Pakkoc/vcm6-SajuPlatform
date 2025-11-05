@@ -35,6 +35,8 @@ const parseEnv = <Schema extends z.ZodTypeAny>(
 export type ClientEnv = z.infer<typeof clientEnvSchema>;
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
+const isBrowser = typeof window !== "undefined";
+
 export const clientEnv = parseEnv(clientEnvSchema, {
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
@@ -61,14 +63,29 @@ const ensureProductionSecrets = (env: ServerEnv) => {
   return env;
 };
 
-export const serverEnv = ensureProductionSecrets(
-  parseEnv(serverEnvSchema, {
-    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-    CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    SUPABASE_URL: process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL,
-    TOSS_SECRET_KEY: process.env.TOSS_SECRET_KEY,
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    CRON_SECRET: process.env.CRON_SECRET,
-  }),
-);
+let cachedServerEnv: ServerEnv | null = null;
+
+const loadServerEnv = () =>
+  ensureProductionSecrets(
+    parseEnv(serverEnvSchema, {
+      CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+      CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      SUPABASE_URL: process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL,
+      TOSS_SECRET_KEY: process.env.TOSS_SECRET_KEY,
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+      CRON_SECRET: process.env.CRON_SECRET,
+    }),
+  );
+
+export const getServerEnv = (): ServerEnv => {
+  if (isBrowser) {
+    throw new Error("서버 환경 변수는 클라이언트에서 사용할 수 없습니다.");
+  }
+
+  if (!cachedServerEnv) {
+    cachedServerEnv = loadServerEnv();
+  }
+
+  return cachedServerEnv;
+};

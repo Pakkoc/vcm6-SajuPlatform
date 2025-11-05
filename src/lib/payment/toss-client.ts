@@ -1,10 +1,11 @@
 import { Buffer } from "buffer";
-import { serverEnv } from "@/constants/env";
+import { getServerEnv } from "@/constants/env";
 
 const TOSS_BASE_URL = "https://api.tosspayments.com/v1";
 
 const getAuthHeader = () => {
-  const encoded = Buffer.from(`${serverEnv.TOSS_SECRET_KEY}:`).toString("base64");
+  const { TOSS_SECRET_KEY } = getServerEnv();
+  const encoded = Buffer.from(`${TOSS_SECRET_KEY}:`).toString("base64");
   return `Basic ${encoded}`;
 };
 
