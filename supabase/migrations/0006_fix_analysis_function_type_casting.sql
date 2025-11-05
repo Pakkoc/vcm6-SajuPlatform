@@ -19,10 +19,15 @@ BEGIN
   END IF;
 END $$;
 
--- saju_analyses 테이블의 컬럼 타입을 ENUM으로 변경
+-- 1. 기존 CHECK 제약조건 제거
 ALTER TABLE public.saju_analyses 
-  ALTER COLUMN gender TYPE gender_type USING gender::gender_type,
-  ALTER COLUMN model_used TYPE model_type USING model_used::model_type;
+  DROP CONSTRAINT IF EXISTS saju_analyses_gender_check,
+  DROP CONSTRAINT IF EXISTS saju_analyses_model_used_check;
+
+-- 2. 컬럼 타입을 ENUM으로 변경
+ALTER TABLE public.saju_analyses 
+  ALTER COLUMN gender TYPE gender_type USING gender::text::gender_type,
+  ALTER COLUMN model_used TYPE model_type USING model_used::text::model_type;
 
 -- 함수 재생성 (올바른 타입 캐스팅 사용)
 CREATE OR REPLACE FUNCTION public.create_analysis_with_usage(
