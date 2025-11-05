@@ -1,0 +1,17 @@
+# Clerk
+npm install @clerk/nextjs
+
+# Supabase
+npm install @supabase/supabase-js @supabase/ssr
+
+# 토스페이먼츠
+npm install @tosspayments/payment-widget-sdk
+
+# Gemini API
+npm install @google/generative-ai
+
+# Webhook 검증 (Clerk)
+npm install svix
+
+# 유틸리티
+npm install zod  # 환경변수 검증용
