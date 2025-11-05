@@ -1,5 +1,3 @@
-"use client";
-
 import { z } from "zod";
 
 export const SajuGenderSchema = z.enum(["male", "female"]);
