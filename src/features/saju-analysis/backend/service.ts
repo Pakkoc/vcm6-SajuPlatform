@@ -170,10 +170,39 @@ export const createAnalysis = async (
     clerk_user_id: string;
   };
 
-  const subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
+  let subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
+
+  // 구독 정보가 없으면 Free 플랜 자동 생성
+  const subscriptionNotFound =
+    subscriptionResult.error?.code === "PGRST116" || !subscriptionResult.data;
+
+  if (subscriptionNotFound) {
+    logger.info("구독 정보가 없어 Free 플랜을 생성합니다.", { userId: userData.id });
+    
+    const createResult = await (supabase as unknown as any)
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: userData.id,
+          plan: SUBSCRIPTION_PLANS.free,
+          status: "active",
+          remaining_count: PLAN_LIMITS[SUBSCRIPTION_PLANS.free].monthlyLimit,
+        },
+        { onConflict: "user_id" },
+      )
+      .select("plan, remaining_count")
+      .single();
+
+    if (createResult.error || !createResult.data) {
+      logger.error("Free 플랜 생성 실패", createResult.error);
+      return failure(500, analysisErrorCodes.subscriptionNotFound, "구독 정보를 생성하지 못했습니다.");
+    }
+
+    subscriptionResult = createResult;
+  }
 
   if (subscriptionResult.error || !subscriptionResult.data) {
-    return failure(404, analysisErrorCodes.subscriptionNotFound, "구독 정보를 찾을 수 없습니다.");
+    return failure(500, analysisErrorCodes.subscriptionNotFound, "구독 정보를 조회하지 못했습니다.");
   }
 
   const subscriptionData = subscriptionResult.data as unknown as {
