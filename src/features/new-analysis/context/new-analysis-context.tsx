@@ -10,13 +10,12 @@ import {
 } from "react";
 import { z } from "zod";
 import { apiClient, extractApiErrorMessage } from "@/lib/remote/api-client";
-import { SajuGenderSchema } from "@/features/saju-analysis/lib/dto";
 
 type AnalysisFormData = {
   name: string;
   birthDate: string;
   birthTime: string;
-  gender: z.infer<typeof SajuGenderSchema> | null;
+  gender: "male" | "female" | null;
   isBirthTimeUnknown: boolean;
 };
 
@@ -125,7 +124,7 @@ const ValidationSchema = z
     name: z.string().min(1, "이름을 입력하세요."),
     birthDate: z.string().min(1, "생년월일을 선택하세요."),
     birthTime: z.string(),
-    gender: SajuGenderSchema.nullable().refine((value) => value !== null, {
+    gender: z.enum(["male", "female"]).nullable().refine((value) => value !== null, {
       message: "성별을 선택하세요.",
     }),
     isBirthTimeUnknown: z.boolean(),
