@@ -60,14 +60,22 @@ const mapDetail = (row: {
 
 const buildPrompt = (body: CreateAnalysisBody) => {
   const birthTime = body.birthTime ?? "모름";
+  
+  // 한국 시간대(Asia/Seoul) 기준으로 현재 연도 가져오기
+  const currentYear = new Date().toLocaleString('ko-KR', { 
+    timeZone: 'Asia/Seoul',
+    year: 'numeric' 
+  });
+  
   return `다음 정보를 바탕으로 한국어로 사주팔자를 해석해 주세요.
 - 이름: ${body.name}
 - 생년월일: ${body.birthDate}
 - 출생시간: ${birthTime}
 - 성별: ${body.gender === "male" ? "남성" : "여성"}
+- 현재 연도: ${currentYear}년
 
 1. 전반적인 성향
-2. 올해의 흐름
+2. ${currentYear}년의 흐름과 운세
 3. 인간관계와 커리어
 4. 주의할 점과 개선 방향
 
