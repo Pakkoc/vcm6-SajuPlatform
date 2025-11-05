@@ -46,8 +46,14 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
+      // Body를 먼저 읽어서 저장
+      const body = await c.req.json();
+      
+      // 인증 확인 (body 읽기 후에 수행)
       const userId = await getAuthenticatedUserId(c.req.raw);
-      const parsedBody = CreateAnalysisBodySchema.safeParse(await c.req.json());
+      
+      // Body 검증
+      const parsedBody = CreateAnalysisBodySchema.safeParse(body);
 
       if (!parsedBody.success) {
         return respond(
