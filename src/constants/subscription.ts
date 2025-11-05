@@ -1,5 +1,3 @@
-"use client";
-
 export const SUBSCRIPTION_PLANS = {
   free: "free",
   pro: "pro",
