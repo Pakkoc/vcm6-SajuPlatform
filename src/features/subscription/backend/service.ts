@@ -11,6 +11,21 @@ import { subscriptionErrorCodes } from "./error";
 
 const formatDate = (date: Date) => date.toISOString().slice(0, 10);
 
+const createFreeSubscription = async (supabase: SupabaseDb, userId: string) =>
+  (supabase as unknown as any)
+    .from("subscriptions")
+    .upsert(
+      {
+        user_id: userId,
+        plan: SUBSCRIPTION_PLANS.free,
+        status: SUBSCRIPTION_STATUS.active,
+        remaining_count: PLAN_LIMITS[SUBSCRIPTION_PLANS.free].monthlyLimit,
+      },
+      { onConflict: "user_id" },
+    )
+    .select("plan, status, remaining_count, next_billing_date, billing_key")
+    .single();
+
 export const getSubscription = async (
   supabase: SupabaseDb,
   clerkUserId: string,
@@ -36,11 +51,26 @@ export const getSubscription = async (
 
   const subscriptionResult = await getSubscriptionByUserId(supabase, userData.id);
 
-  if (subscriptionResult.error || !subscriptionResult.data) {
-    return failure(404, subscriptionErrorCodes.subscriptionNotFound, "구독 정보를 찾을 수 없습니다.");
+  const subscriptionNotFound =
+    subscriptionResult.error?.code === "PGRST116" || !subscriptionResult.data;
+
+  if (subscriptionResult.error && !subscriptionNotFound) {
+    return failure(500, subscriptionErrorCodes.subscriptionFetchFailed, "구독 정보를 조회하지 못했습니다.");
   }
 
-  const subscriptionData = subscriptionResult.data as unknown as {
+  const subscriptionSource = subscriptionNotFound
+    ? await createFreeSubscription(supabase, userData.id)
+    : subscriptionResult;
+
+  if (subscriptionSource.error || !subscriptionSource.data) {
+    return failure(
+      500,
+      subscriptionErrorCodes.subscriptionCreationFailed,
+      "기본 구독 정보를 생성하지 못했습니다.",
+    );
+  }
+
+  const subscriptionData = subscriptionSource.data as unknown as {
     plan: "free" | "pro";
     status: "active" | "pending_cancellation";
     remaining_count: number;
