@@ -15,12 +15,17 @@ export const getAuthenticatedUserId = async (request: Request) => {
     nextRequest = request;
   } else {
     try {
-      nextRequest = new NextRequest(request);
+      // Request body를 읽지 않고 NextRequest를 생성하기 위해
+      // URL과 헤더만 복사하여 새로운 Request 생성
+      const clonedRequest = new Request(request.url, {
+        method: request.method,
+        headers: request.headers,
+      });
+      nextRequest = new NextRequest(clonedRequest);
     } catch (error) {
       throw new Error(
         "Request 객체를 NextRequest로 변환할 수 없습니다. " +
-        "Request body가 이미 사용되었을 가능성이 있습니다. " +
-        "getAuthenticatedUserId는 req.json() 또는 req.text() 호출 전에 실행되어야 합니다."
+        "인증 처리 중 오류가 발생했습니다."
       );
     }
   }
