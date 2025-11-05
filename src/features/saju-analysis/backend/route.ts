@@ -11,7 +11,7 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
 
     try {
-      const userId = await getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId(c.req.raw);
       const result = await listAnalyses(supabase, userId);
       return respond(c, result);
     } catch (error) {
@@ -29,7 +29,7 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
     const analysisId = c.req.param("id");
 
     try {
-      const userId = await getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId(c.req.raw);
       const result = await getAnalysisDetail(supabase, userId, analysisId);
       return respond(c, result);
     } catch (error) {
@@ -54,7 +54,7 @@ export const registerSajuAnalysisRoutes = (app: Hono<AppEnv>) => {
     }
 
     try {
-      const userId = await getAuthenticatedUserId();
+      const userId = await getAuthenticatedUserId(c.req.raw);
       const result = await createAnalysis(supabase, logger, userId, parsedBody.data);
       return respond(c, result);
     } catch (error) {
