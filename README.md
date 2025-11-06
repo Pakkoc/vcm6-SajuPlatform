@@ -1,92 +1,73 @@
-이 프로젝트는 [`EasyNext`](https://github.com/easynext/easynext)를 사용해 생성된 [Next.js](https://nextjs.org) 프로젝트입니다.
+# Saju맛피아
 
-## Getting Started
+> AI가 분석하는 당신의 사주팔자
 
-개발 서버를 실행합니다.<br/>
-환경에 따른 명령어를 사용해주세요.
+## 서비스 소개
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Saju맛피아**는 Google Gemini AI를 활용한 차세대 온라인 사주 분석 서비스입니다. 전통적인 명리학과 최신 AI 기술을 결합하여, 누구나 쉽고 정확하게 자신의 사주팔자를 분석받을 수 있습니다.
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인할 수 있습니다.
+복잡한 절차나 전문 지식 없이 간단한 정보만 입력하면, AI가 당신의 성격, 재물운, 애정운, 건강운을 종합적으로 분석해드립니다.
 
-`app/page.tsx` 파일을 수정하여 페이지를 편집할 수 있습니다. 파일을 수정하면 자동으로 페이지가 업데이트됩니다.
+## 왜 Saju맛피아인가요?
 
-## 기본 포함 라이브러리
+### 🤖 AI 기반 정확한 분석
 
-- [Next.js](https://nextjs.org)
-- [React](https://react.dev)
-- [Tailwind CSS](https://tailwindcss.com)
-- [TypeScript](https://www.typescriptlang.org)
-- [ESLint](https://eslint.org)
-- [Prettier](https://prettier.io)
-- [Shadcn UI](https://ui.shadcn.com)
-- [Lucide Icon](https://lucide.dev)
-- [date-fns](https://date-fns.org)
-- [react-use](https://github.com/streamich/react-use)
-- [es-toolkit](https://github.com/toss/es-toolkit)
-- [Zod](https://zod.dev)
-- [React Query](https://tanstack.com/query/latest)
-- [React Hook Form](https://react-hook-form.com)
-- [TS Pattern](https://github.com/gvergnaud/ts-pattern)
+Google Gemini AI가 명리학 원리를 기반으로 정확하게 분석합니다. 기존의 단순 알고리즘 기반 분석이 아닌, 대규모 언어 모델의 깊이 있는 이해력을 바탕으로 개인 맞춤형 사주 분석을 제공합니다.
 
-## 사용 가능한 명령어
+### 💰 합리적인 가격
 
-한글버전 사용
+- **무료 체험**: 최초 1회 무료 분석으로 서비스를 먼저 경험해보세요
+- **Pro 플랜**: 월 3,900원으로 월 10회의 상세 분석을 받을 수 있습니다
+- 투명한 가격 정책으로 부담 없이 이용하세요
 
-```sh
-easynext lang ko
-```
+### 📁 분석 내역 영구 보관
 
-최신버전으로 업데이트
+모든 분석 결과를 대시보드에 저장하여 언제든지 다시 확인할 수 있습니다. 시간이 지나도 과거 분석 내역을 쉽게 찾아보고 비교해볼 수 있습니다.
 
-```sh
-npm i -g @easynext/cli@latest
-# or
-yarn add -g @easynext/cli@latest
-# or
-pnpm add -g @easynext/cli@latest
-```
+## 주요 기능
 
-Supabase 설정
+### 간편한 분석 프로세스
 
-```sh
-easynext supabase
-```
+1. **회원가입**: Google 소셜 로그인으로 간단하게 시작
+2. **정보 입력**: 이름, 생년월일, 출생시간, 성별만 입력하면 끝
+3. **AI 분석**: Gemini AI가 명리학 기반으로 분석
+4. **결과 확인**: 성격, 재물운, 애정운, 건강운 등 종합 분석 결과 확인
 
-Next-Auth 설정
+### 개인화된 대시보드
 
-```sh
-easynext auth
+- 모든 분석 내역을 한눈에 확인
+- 이름으로 검색하여 원하는 분석 결과 빠르게 찾기
+- 분석일자별로 정리된 깔끔한 인터페이스
 
-# ID,PW 로그인
-easynext auth idpw
-# 카카오 로그인
-easynext auth kakao
-```
+### 유연한 구독 관리
 
-유용한 서비스 연동
+- 언제든지 Pro 플랜으로 업그레이드 가능
+- 구독 취소 후에도 다음 결제일까지 서비스 이용 가능
+- 필요할 때 다시 쉽게 구독 재개
 
-```sh
-# Google Analytics
-easynext gtag
+## 요금제
 
-# Microsoft Clarity
-easynext clarity
+| | Free 플랜 | Pro 플랜 |
+|---|---|---|
+| **가격** | ₩0 | ₩3,900/월 |
+| **분석 횟수** | 최초 1회 무료 | 월 10회 |
+| **AI 모델** | Gemini 2.5 Flash | Gemini 2.5 Pro |
+| **분석 품질** | 기본 분석 | 상세 분석 |
+| **내역 보관** | ✅ | ✅ |
 
-# ChannelIO
-easynext channelio
+## 서비스 특징
 
-# Sentry
-easynext sentry
+- **정확성**: Google Gemini AI의 최신 기술로 더욱 정확한 분석
+- **편의성**: 복잡한 절차 없이 간단한 정보 입력만으로 분석 완료
+- **신뢰성**: 명리학 원리를 기반으로 한 체계적인 분석
+- **확장성**: 분석 내역을 영구 보관하여 시간에 따른 변화 추적 가능
 
-# Google Adsense
-easynext adsense
-```
+## 시작하기
+
+Saju맛피아에서 당신만의 사주팔자를 분석받아보세요. 무료 체험으로 시작하여, 필요하다면 Pro 플랜으로 업그레이드하여 더욱 상세한 분석을 받을 수 있습니다.
+
+**지금 바로 무료로 시작하기** → 서비스 이용을 시작하세요!
+
+---
+
+*Saju맛피아는 AI 기술과 전통 명리학을 결합하여 더 나은 서비스를 제공하기 위해 지속적으로 발전하고 있습니다.*
